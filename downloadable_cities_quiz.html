@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciutats Sostenibles i Revolució Industrial - Qüestionari Interactiu</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/lucide-react.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { CheckCircle, XCircle, Star, Factory, Leaf, Building2, Users, Lightbulb } = lucide;
+
+        const CitiesQuizApp = () => {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [score, setScore] = useState(0);
+            const [selectedAnswer, setSelectedAnswer] = useState('');
+            const [showFeedback, setShowFeedback] = useState(false);
+            const [quizCompleted, setQuizCompleted] = useState(false);
+            const [answers, setAnswers] = useState({});
+
+            const questions = [
+                {
+                    id: 1,
+                    type: 'multiple',
+                    question: "Què va passar durant la Revolució Industrial?",
+                    options: [
+                        "Les persones van començar a viure en granges",
+                        "Es van inventar les màquines i la gent va anar a viure a les ciutats",
+                        "Es van descobrir nous planetes",
+                        "Es va inventar internet"
+                    ],
+                    correct: 1,
+                    explanation: "🎉 ¡Genial! Ets un superdetectiu de la història! La Revolució Industrial va començar al segle XVIII i va portar la invenció de màquines que van canviar la manera de treballar. Moltes persones van deixar el camp per anar a treballar a les fàbriques de les ciutats. ¡Molt bé! 🏭✨",
+                    wrongExplanation: "🤔 Gairebé ho tens! La Revolució Industrial va ser quan es van inventar les màquines i moltes persones van anar a viure a les ciutats per treballar a les fàbriques. ¡Segur que la següent la claves! 💪",
+                    icon: React.createElement(Factory, { className: "w-8 h-8 text-gray-600" })
+                },
+                {
+                    id: 2,
+                    type: 'fill',
+                    question: "Una ciutat sostenible és aquella que cuida el _______ i utilitza energia _______.",
+                    blanks: ["medi ambient", "renovable"],
+                    explanation: "🌟 ¡Perfecte! Ets un campió de la sostenibilitat! Una ciutat sostenible cuida el medi ambient i utilitza energia renovable com la solar o l'eòlica per no contaminar. ¡El planeta t'està aplaudint! 🌍👏",
+                    wrongExplanation: "🌱 Molt a prop! Recorda: les ciutats sostenibles cuiden el medi ambient i utilitzen energia renovable. ¡Tu pots! 🚀",
+                    icon: React.createElement(Leaf, { className: "w-8 h-8 text-green-600" })
+                },
+                {
+                    id: 3,
+                    type: 'image',
+                    question: "Quina d'aquestes imatges representa millor una ciutat sostenible?",
+                    options: [
+                        { text: "Ciutat amb moltes fàbriques que fan fum", emoji: "🏭💨" },
+                        { text: "Ciutat amb parcs, bicicletes i panells solars", emoji: "🌳🚲☀️" },
+                        { text: "Ciutat només amb cotxes i carreteres", emoji: "🚗🛣️" },
+                        { text: "Ciutat sense cap edifici", emoji: "🌾" }
+                    ],
+                    correct: 1,
+                    explanation: "🏆 ¡Excel·lent! Tens un ull fantàstic per identificar ciutats sostenibles! Una ciutat sostenible té espais verds, promou el transport net com les bicicletes i utilitza energia renovable com els panells solars. ¡Eres increïble! 🌟🌳",
+                    wrongExplanation: "🎯 Molt bona observació! Una ciutat sostenible necessita espais verds, transport net i energia renovable per cuidar el planeta. ¡La següent segur que l'encertes! 🌿",
+                    icon: React.createElement(Building2, { className: "w-8 h-8 text-blue-600" })
+                },
+                {
+                    id: 4,
+                    type: 'multiple',
+                    question: "Quin problema van causar les primeres ciutats industrials?",
+                    options: [
+                        "Massa diversió per als nens",
+                        "Contaminació de l'aire i l'aigua",
+                        "Massa espais verds",
+                        "Massa silenci"
+                    ],
+                    correct: 1,
+                    explanation: "🌟 ¡Correcte! Ets un expert en història urbana! Les primeres ciutats industrials tenien moltes fàbriques que contaminaven l'aire amb fum i l'aigua amb residus. Per això ara volem ciutats més netes! ¡Molt intel·ligent! 🧠💡",
+                    wrongExplanation: "📚 Bona reflexió! Les primeres ciutats industrials van tenir problemes de contaminació a causa de les fàbriques que feien molt de fum. ¡Continues aprenent genial! 🌟",
+                    icon: React.createElement(Users, { className: "w-8 h-8 text-red-600" })
+                },
+                {
+                    id: 5,
+                    type: 'fill',
+                    question: "Les ciutats sostenibles utilitzen transport _______ com autobusos elèctrics i _______.",
+                    blanks: ["net", "bicicletes"],
+                    explanation: "🚀 ¡Fantàstic! Ets un mestre del transport sostenible! El transport net no contamina. Els autobusos elèctrics i les bicicletes són exemples perfectes! ¡El futur del transport està en bones mans amb tu! 🚌⚡🚲",
+                    wrongExplanation: "🚲 Molt bon intent! El transport net, com autobusos elèctrics i bicicletes, no contamina l'aire. ¡Continues millorant! 💪",
+                    icon: React.createElement(Lightbulb, { className: "w-8 h-8 text-yellow-600" })
+                },
+                {
+                    id: 6,
+                    type: 'multiple',
+                    question: "Quina d'aquestes fonts d'energia és renovable?",
+                    options: [
+                        "Carbó",
+                        "Petroli",
+                        "Energia solar",
+                        "Gas natural"
+                    ],
+                    correct: 2,
+                    explanation: "☀️ ¡Brillant com el sol! L'energia solar és renovable perquè el sol sempre brillarà i no s'acaba mai! És neta, no contamina i és gratis. ¡Ets un geni de les energies verdes! 🌞✨",
+                    wrongExplanation: "🌞 Molt bon raonament! L'energia solar ve del sol i és renovable perquè mai s'acaba. Les altres (carbó, petroli, gas) s'acaben i contaminen. ¡Ho faràs genial la següent! 💫",
+                    icon: React.createElement(Leaf, { className: "w-8 h-8 text-orange-500" })
+                },
+                {
+                    id: 7,
+                    type: 'image',
+                    question: "Quina d'aquestes opcions genera energia renovable?",
+                    options: [
+                        { text: "Molins de vent (energia eòlica)", emoji: "💨🌪️" },
+                        { text: "Fàbrica de carbó", emoji: "🏭⚫" },
+                        { text: "Cotxe de gasolina", emoji: "🚗⛽" },
+                        { text: "Xemeneia fumant", emoji: "🏠💨" }
+                    ],
+                    correct: 0,
+                    explanation: "🌪️ ¡Increïble! Els molins de vent utilitzen la força del vent per generar electricitat! És energia renovable perquè el vent sempre hi serà i no contamina gens. ¡Ets un superheroi de l'energia neta! 💨⚡🦸",
+                    wrongExplanation: "💨 Excel·lent esforç! Els molins de vent (energia eòlica) utilitzen el vent per fer electricitat neta i renovable. ¡Cada pregunta t'ajuda a aprendre més! 🌟",
+                    icon: React.createElement(Lightbulb, { className: "w-8 h-8 text-cyan-600" })
+                }
+            ];
+
+            const handleAnswer = (answer) => {
+                setSelectedAnswer(answer);
+                setShowFeedback(true);
+                
+                const question = questions[currentQuestion];
+                let isCorrect = false;
+                
+                if (question.type === 'multiple' || question.type === 'image') {
+                    isCorrect = parseInt(answer) === question.correct;
+                } else if (question.type === 'fill') {
+                    const userAnswers = answer.toLowerCase().split(',').map(a => a.trim());
+                    const correctAnswers = question.blanks.map(a => a.toLowerCase());
+                    isCorrect = userAnswers.every((ans, index) => 
+                        correctAnswers[index].includes(ans) || ans.includes(correctAnswers[index])
+                    );
+                }
+                
+                if (isCorrect) {
+                    setScore(score + 1);
+                }
+                
+                setAnswers({...answers, [currentQuestion]: {answer, isCorrect}});
+            };
+
+            const nextQuestion = () => {
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                    setSelectedAnswer('');
+                    setShowFeedback(false);
+                } else {
+                    setQuizCompleted(true);
+                }
+            };
+
+            const resetQuiz = () => {
+                setCurrentQuestion(0);
+                setScore(0);
+                setSelectedAnswer('');
+                setShowFeedback(false);
+                setQuizCompleted(false);
+                setAnswers({});
+            };
+
+            const FillInBlanks = ({ question, onAnswer }) => {
+                const [inputs, setInputs] = useState(['', '']);
+                
+                const handleInputChange = (index, value) => {
+                    const newInputs = [...inputs];
+                    newInputs[index] = value;
+                    setInputs(newInputs);
+                };
+                
+                const handleSubmit = () => {
+                    onAnswer(inputs.join(','));
+                };
+                
+                const parts = question.question.split('_______');
+                
+                return React.createElement('div', { className: "space-y-6" },
+                    React.createElement('div', { className: "text-xl font-medium flex items-center gap-3 mb-6" },
+                        question.icon,
+                        React.createElement('span', null, question.question)
+                    ),
+                    React.createElement('div', { className: "space-y-4" },
+                        React.createElement('div', { className: "text-lg" },
+                            React.createElement('span', null, parts[0]),
+                            React.createElement('input', {
+                                type: "text",
+                                value: inputs[0],
+                                onChange: (e) => handleInputChange(0, e.target.value),
+                                className: "mx-2 px-4 py-2 border-2 border-blue-300 rounded-lg focus:border-blue-500 focus:outline-none text-center font-semibold",
+                                placeholder: "escriu aquí"
+                            }),
+                            React.createElement('span', null, parts[1]),
+                            React.createElement('input', {
+                                type: "text",
+                                value: inputs[1],
+                                onChange: (e) => handleInputChange(1, e.target.value),
+                                className: "mx-2 px-4 py-2 border-2 border-blue-300 rounded-lg focus:border-blue-500 focus:outline-none text-center font-semibold",
+                                placeholder: "escriu aquí"
+                            }),
+                            React.createElement('span', null, parts[2])
+                        )
+                    ),
+                    React.createElement('button', {
+                        onClick: handleSubmit,
+                        disabled: inputs[0].trim() === '' || inputs[1].trim() === '',
+                        className: "px-6 py-3 bg-blue-500 text-white text-lg rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    }, "Comprovar Resposta")
+                );
+            };
+
+            if (quizCompleted) {
+                const percentage = Math.round((score / questions.length) * 100);
+                return React.createElement('div', { className: "container" },
+                    React.createElement('div', { className: "max-w-4xl mx-auto p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg" },
+                        React.createElement('div', { className: "text-center space-y-6" },
+                            React.createElement('div', { className: "text-6xl" }, "🎉"),
+                            React.createElement('h2', { className: "text-3xl font-bold text-green-600" }, "Qüestionari Completat!"),
+                            React.createElement('div', { className: "text-6xl font-bold text-blue-600" }, `${score}/${questions.length}`),
+                            React.createElement('div', { className: "text-xl text-gray-700" }, `Has encertat el ${percentage}% de les preguntes!`),
+                            React.createElement('div', { className: "flex justify-center gap-2 my-4" },
+                                [...Array(5)].map((_, i) =>
+                                    React.createElement(Star, {
+                                        key: i,
+                                        className: `w-8 h-8 ${i < Math.ceil(percentage/20) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`
+                                    })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-white p-6 rounded-lg shadow-lg" },
+                                React.createElement('h3', { className: "text-xl font-semibold mb-4 text-gray-800" }, "🎓 El que has après:"),
+                                React.createElement('div', { className: "text-left space-y-2 text-gray-700" },
+                                    React.createElement('p', null, "🏭 La Revolució Industrial va canviar la manera de viure de les persones"),
+                                    React.createElement('p', null, "🌱 Les ciutats sostenibles cuiden el medi ambient"),
+                                    React.createElement('p', null, "🚲 El transport net ajuda a no contaminar"),
+                                    React.createElement('p', null, "☀️ Les energies renovables són millors per al planeta"),
+                                    React.createElement('p', null, "🌳 Els espais verds fan les ciutats més boniques i saludables"),
+                                    React.createElement('p', null, "💨 L'energia eòlica i solar no s'acaben mai i són netes")
+                                )
+                            ),
+                            React.createElement('button', {
+                                onClick: resetQuiz,
+                                className: "px-8 py-3 bg-blue-500 text-white text-lg rounded-lg hover:bg-blue-600 transition-colors"
+                            }, "Tornar a Jugar")
+                        )
+                    )
+                );
+            }
+
+            const question = questions[currentQuestion];
+            const isCorrect = answers[currentQuestion]?.isCorrect;
+
+            return React.createElement('div', { className: "container" },
+                React.createElement('div', { className: "max-w-4xl mx-auto p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg" },
+                    React.createElement('div', { className: "mb-6" },
+                        React.createElement('div', { className: "flex justify-between items-center mb-4" },
+                            React.createElement('h1', { className: "text-2xl font-bold text-gray-800" }, "Ciutats Sostenibles i Revolució Industrial"),
+                            React.createElement('div', { className: "text-lg font-semibold text-blue-600" }, `Pregunta ${currentQuestion + 1} de ${questions.length}`)
+                        ),
+                        React.createElement('div', { className: "w-full bg-gray-200 rounded-full h-3 mb-4" },
+                            React.createElement('div', {
+                                className: "bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-300",
+                                style: { width: `${((currentQuestion + 1) / questions.length) * 100}%` }
+                            })
+                        ),
+                        React.createElement('div', { className: "text-right text-sm text-gray-600" }, `Puntuació: ${score}/${currentQuestion + (showFeedback ? 1 : 0)}`)
+                    ),
+                    React.createElement('div', { className: "bg-white p-8 rounded-lg shadow-lg" },
+                        !showFeedback ? (
+                            React.createElement('div', { className: "space-y-6" },
+                                question.type === 'multiple' && React.createElement('div', { className: "space-y-4" },
+                                    React.createElement('div', { className: "text-xl font-medium flex items-center gap-3 mb-6" },
+                                        question.icon,
+                                        question.question
+                                    ),
+                                    React.createElement('div', { className: "grid gap-3" },
+                                        question.options.map((option, index) =>
+                                            React.createElement('button', {
+                                                key: index,
+                                                onClick: () => handleAnswer(index.toString()),
+                                                className: "p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 text-lg"
+                                            },
+                                                React.createElement('span', { className: "font-semibold text-blue-600 mr-3" }, String.fromCharCode(65 + index) + "."),
+                                                option
+                                            )
+                                        )
+                                    )
+                                ),
+                                question.type === 'image' && React.createElement('div', { className: "space-y-4" },
+                                    React.createElement('div', { className: "text-xl font-medium flex items-center gap-3 mb-6" },
+                                        question.icon,
+                                        question.question
+                                    ),
+                                    React.createElement('div', { className: "grid gap-4" },
+                                        question.options.map((option, index) =>
+                                            React.createElement('button', {
+                                                key: index,
+                                                onClick: () => handleAnswer(index.toString()),
+                                                className: "p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 flex items-center gap-4"
+                                            },
+                                                React.createElement('div', { className: "text-4xl" }, option.emoji),
+                                                React.createElement('div', { className: "text-lg" },
+                                                    React.createElement('span', { className: "font-semibold text-blue-600 mr-3" }, String.fromCharCode(65 + index) + "."),
+                                                    option.text
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                question.type === 'fill' && React.createElement(FillInBlanks, { question: question, onAnswer: handleAnswer })
+                            )
+                        ) : (
+                            React.createElement('div', { className: "space-y-6" },
+                                React.createElement('div', { className: `flex items-center gap-3 text-2xl font-bold ${isCorrect ? 'text-green-600' : 'text-orange-600'}` },
+                                    isCorrect ? React.createElement(CheckCircle, { className: "w-8 h-8" }) : React.createElement(XCircle, { className: "w-8 h-8" }),
+                                    isCorrect ? '🎉 ¡Genial!' : '🌟 ¡Molt a prop!'
+                                ),
+                                React.createElement('div', { className: `p-6 rounded-lg ${isCorrect ? 'bg-green-50 border-2 border-green-200' : 'bg-orange-50 border-2 border-orange-200'}` },
+                                    React.createElement('p', { className: "text-lg leading-relaxed" },
+                                        isCorrect ? question.explanation : question.wrongExplanation
+                                    )
+                                ),
+                                React.createElement('button', {
+                                    onClick: nextQuestion,
+                                    className: "w-full px-6 py-3 bg-blue-500 text-white text-lg rounded-lg hover:bg-blue-600 transition-colors"
+                                }, currentQuestion < questions.length - 1 ? 'Següent Pregunta' : 'Veure Resultats')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(CitiesQuizApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
